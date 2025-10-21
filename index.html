@@ -223,92 +223,192 @@
     const dataUrl = resolveDataUrl("afl_clubs_2024_geo.csv");
     const australiaTopoUrl = resolveDataUrl("world-110m.json");
 
+    const melbourneBounds = {
+      lonMin: 144.2,
+      lonMax: 145.4,
+      latMin: -38.4,
+      latMax: -37.45
+    };
+
+    const melbourneCenter = [
+      (melbourneBounds.lonMin + melbourneBounds.lonMax) / 2,
+      (melbourneBounds.latMin + melbourneBounds.latMax) / 2
+    ];
+
+    const melbourneExtentFeature = {
+      type: "Feature",
+      properties: { name: "Melbourne-Geelong extent" },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          [melbourneBounds.lonMin, melbourneBounds.latMin],
+          [melbourneBounds.lonMax, melbourneBounds.latMin],
+          [melbourneBounds.lonMax, melbourneBounds.latMax],
+          [melbourneBounds.lonMin, melbourneBounds.latMax],
+          [melbourneBounds.lonMin, melbourneBounds.latMin]
+        ]]
+      }
+    };
+
     const mapSpec = withSharedParams({
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       width: 900,
       height: 520,
       data: { url: dataUrl },
-      projection: {
-        type: "equalEarth",
-        fit: {
-          data: {
-            url: australiaTopoUrl,
-            format: { type: "topojson", feature: "countries" }
-          },
-          filter: "datum.properties.name == 'Australia'"
-        }
-      },
       layer: [
         {
-          data: {
-            url: australiaTopoUrl,
-            format: { type: "topojson", feature: "countries" }
+          projection: {
+            type: "equalEarth",
+            center: [133.7751, -25.2744],
+            scale: 1200
           },
-          transform: [{ filter: "datum.properties.name == 'Australia'" }],
-          mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2 }
-        },
-        {
-          data: { graticule: true },
-          mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent" }
-        },
-        {
-          transform: [
-            { filter: "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
-            { filter: "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" }
-          ],
-          mark: { type: "circle", opacity: 0.9, strokeWidth: 1.5 },
-          encoding: {
-            longitude: { field: "lon", type: "quantitative" },
-            latitude: { field: "lat", type: "quantitative" },
-            size: {
-              field: "membership_2024",
-              type: "quantitative",
-              title: "Members (2024)",
-              scale: { range: [750, 3200] }
-            },
-            color: {
-              field: "state",
-              type: "nominal",
-              legend: { title: "State" },
-              scale: { scheme: "tableau10" }
-            },
-            opacity: {
-              condition: [
-                { test: "hoverClub != null && datum.club == hoverClub", value: 1 },
-                { test: "hoverClub == null && hoverState != null && datum.state == hoverState", value: 0.95 },
-                { test: "indexof(selectedClubs, datum.club) >= 0", value: 1 },
-                { test: "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0", value: 0.95 }
-              ],
-              value: 0.35
-            },
-            stroke: {
-              condition: {
-                test: "indexof(selectedClubs, datum.club) >= 0",
-                value: "#1a1a1a"
+          layer: [
+            {
+              data: {
+                url: australiaTopoUrl,
+                format: { type: "topojson", feature: "countries" }
               },
-              value: "#ffffff"
+              transform: [{ filter: "datum.properties.name == 'Australia'" }],
+              mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2, clip: true }
             },
-            tooltip: [
-              { field: "club", title: "Club" },
-              { field: "ground", title: "Home ground" },
-              { field: "membership_2024", title: "Members (2024)", format: "," },
-              { field: "state", title: "State" }
-            ]
-          }
+            {
+              data: { graticule: true },
+              mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent", clip: true }
+            },
+            {
+              transform: [
+                { filter: "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+                { filter: "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" }
+              ],
+              mark: { type: "circle", opacity: 0.9, strokeWidth: 1.5 },
+              encoding: {
+                longitude: { field: "lon", type: "quantitative" },
+                latitude: { field: "lat", type: "quantitative" },
+                size: {
+                  field: "membership_2024",
+                  type: "quantitative",
+                  title: "Members (2024)",
+                  scale: { range: [750, 3200] }
+                },
+                color: {
+                  field: "state",
+                  type: "nominal",
+                  legend: { title: "State" },
+                  scale: { scheme: "tableau10" }
+                },
+                opacity: {
+                  condition: [
+                    { test: "hoverClub != null && datum.club == hoverClub", value: 1 },
+                    { test: "hoverClub == null && hoverState != null && datum.state == hoverState", value: 0.95 },
+                    { test: "indexof(selectedClubs, datum.club) >= 0", value: 1 },
+                    { test: "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0", value: 0.95 }
+                  ],
+                  value: 0.35
+                },
+                stroke: {
+                  condition: {
+                    test: "indexof(selectedClubs, datum.club) >= 0",
+                    value: "#1a1a1a"
+                  },
+                  value: "#ffffff"
+                },
+                tooltip: [
+                  { field: "club", title: "Club" },
+                  { field: "ground", title: "Home ground" },
+                  { field: "membership_2024", title: "Members (2024)", format: "," },
+                  { field: "state", title: "State" }
+                ]
+              }
+            },
+            {
+              transform: [
+                { window: [{ op: "rank", as: "rank_membership" }], sort: [{ field: "membership_2024", order: "descending" }] },
+                { filter: "datum.rank_membership <= 3" }
+              ],
+              mark: { type: "text", dy: -18, fontWeight: "bold", fontSize: 12, fill: "#111", stroke: "white", strokeWidth: 3, strokeOpacity: 0.8 },
+              encoding: {
+                longitude: { field: "lon", type: "quantitative" },
+                latitude: { field: "lat", type: "quantitative" },
+                text: {
+                  signal: "datum.rank_membership + '. ' + datum.club + ' (' + format(datum.membership_2024, ',') + ')'"
+                }
+              }
+            },
+            {
+              data: { values: [melbourneExtentFeature] },
+              mark: { type: "geoshape", fill: null, stroke: "#0b4aa3", strokeDash: [6, 4], strokeWidth: 2, clip: true }
+            }
+          ]
         },
         {
-          transform: [
-            { window: [{ op: "rank", as: "rank_membership" }], sort: [{ field: "membership_2024", order: "descending" }] },
-            { filter: "datum.rank_membership <= 3" }
-          ],
-          mark: { type: "text", dy: -18, fontWeight: "bold", fontSize: 12, fill: "#111", stroke: "white", strokeWidth: 3, strokeOpacity: 0.8 },
-          encoding: {
-            longitude: { field: "lon", type: "quantitative" },
-            latitude: { field: "lat", type: "quantitative" },
-            text: {
-              signal: "datum.rank_membership + '. ' + datum.club + ' (' + format(datum.membership_2024, ',') + ')'"
+          view: { stroke: "none" },
+          projection: {
+            type: "mercator",
+            center: melbourneCenter,
+            scale: 6500,
+            translate: [710, 180],
+            clipExtent: [[560, 40], [860, 320]]
+          },
+          layer: [
+            {
+              data: {
+                url: australiaTopoUrl,
+                format: { type: "topojson", feature: "countries" }
+              },
+              transform: [{ filter: "datum.properties.name == 'Australia'" }],
+              mark: { type: "geoshape", fill: "#f1f5fb", stroke: "#8eaed0", strokeWidth: 1 }
+            },
+            {
+              data: { values: [melbourneExtentFeature] },
+              mark: { type: "geoshape", fill: null, stroke: "#0b4aa3", strokeWidth: 2 }
+            },
+            {
+              transform: [
+                { filter: `datum.lon >= ${melbourneBounds.lonMin} && datum.lon <= ${melbourneBounds.lonMax}` },
+                { filter: `datum.lat >= ${melbourneBounds.latMin} && datum.lat <= ${melbourneBounds.latMax}` },
+                { filter: "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+                { filter: "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" }
+              ],
+              mark: { type: "circle", opacity: 0.95, strokeWidth: 1.5 },
+              encoding: {
+                longitude: { field: "lon", type: "quantitative" },
+                latitude: { field: "lat", type: "quantitative" },
+                size: {
+                  field: "membership_2024",
+                  type: "quantitative",
+                  scale: { range: [750, 3200] }
+                },
+                color: {
+                  field: "state",
+                  type: "nominal",
+                  legend: null,
+                  scale: { scheme: "tableau10" }
+                },
+                opacity: {
+                  condition: [
+                    { test: "hoverClub != null && datum.club == hoverClub", value: 1 },
+                    { test: "hoverClub == null && hoverState != null && datum.state == hoverState", value: 1 },
+                    { test: "indexof(selectedClubs, datum.club) >= 0", value: 1 },
+                    { test: "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0", value: 1 }
+                  ],
+                  value: 0.45
+                },
+                stroke: {
+                  condition: {
+                    test: "indexof(selectedClubs, datum.club) >= 0",
+                    value: "#1a1a1a"
+                  },
+                  value: "#ffffff"
+                },
+                tooltip: [
+                  { field: "club", title: "Club" },
+                  { field: "ground", title: "Home ground" },
+                  { field: "membership_2024", title: "Members (2024)", format: "," },
+                  { field: "state", title: "State" }
+                ]
+              }
             }
-          }
+          ]
         }
       ]
     });
