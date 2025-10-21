@@ -221,17 +221,30 @@
     }
 
     const dataUrl = resolveDataUrl("afl_clubs_2024_geo.csv");
+    const australiaTopoUrl = resolveDataUrl("world-110m.json");
 
     const mapSpec = withSharedParams({
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       width: 900,
       height: 520,
       data: { url: dataUrl },
-      projection: { type: "equalEarth" },
+      projection: {
+        type: "equalEarth",
+        center: [133.7751, -25.2744],
+        scale: 1200
+      },
       layer: [
         {
+          data: {
+            url: australiaTopoUrl,
+            format: { type: "topojson", feature: "countries" }
+          },
+          transform: [{ filter: "datum.properties.name == 'Australia'" }],
+          mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2, clip: true }
+        },
+        {
           data: { graticule: true },
-          mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent" }
+          mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent", clip: true }
         },
         {
           transform: [
