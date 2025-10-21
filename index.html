@@ -129,7 +129,7 @@
           mark: { type: "geoshape", fill: "#e2e8f0", stroke: "#c4cacf", strokeWidth: 0.5 }
         },
         {
-          data: { url: "data/afl_clubs_2024_geo.csv" },
+          data: { url: "/ass2-fit3179/data/afl_clubs_2024_geo.csv" },
           transform: [
             { filter: "!length(stateFilter) || indexof(stateFilter, datum.state) >= 0" },
             { filter: "!length(clubFilter) || indexof(clubFilter, datum.club) >= 0" }
@@ -165,7 +165,7 @@
           }
         },
         {
-          data: { url: "data/afl_clubs_2024_geo.csv" },
+          data: { url: "/ass2-fit3179/data/afl_clubs_2024_geo.csv" },
           transform: [
             { filter: "indexof(['Collingwood','Carlton','West Coast'], datum.club) >= 0" }
           ],
@@ -186,7 +186,7 @@
       background: "white",
       padding: 12,
       config: baseConfig,
-      data: { url: "/data/afl_memberships_2024.csv" },
+      data: { url: "/ass2-fit3179/data/afl_memberships_2024.csv" },
       params: [
         { name: "clubHover", value: null },
         { name: "clubFilter", value: [] },
@@ -195,7 +195,7 @@
       transform: [
         {
           lookup: "club",
-          from: { data: { url: "../data/afl_club_homegrounds.csv" }, key: "club", fields: ["state"] }
+          from: { data: { url: "/ass2-fit3179/data/afl_club_homegrounds.csv" }, key: "club", fields: ["state"] }
         },
         { filter: "!length(stateFilter) || indexof(stateFilter, datum.state) >= 0" },
         {
@@ -269,7 +269,7 @@
       background: "white",
       padding: 12,
       config: baseConfig,
-      data: { url: "/data/afl_memberships_2024.csv" },
+      data: { url: "/ass2-fit3179/data/afl_memberships_2024.csv" },
       params: [
         { name: "clubHover", value: null },
         { name: "clubFilter", value: [] },
@@ -278,7 +278,7 @@
       transform: [
         {
           lookup: "club",
-          from: { data: { url: "/data/afl_club_homegrounds.csv" }, key: "club", fields: ["state"] }
+          from: { data: { url: "ass2-fit3179/data/afl_club_homegrounds.csv" }, key: "club", fields: ["state"] }
         },
         { filter: "!length(stateFilter) || indexof(stateFilter, datum.state) >= 0" },
         { filter: "!length(clubFilter) || indexof(clubFilter, datum.club) >= 0" },
