@@ -4,32 +4,101 @@
   <meta charset="utf-8" />
   <title>FIT3179 A2 — AFL Membership Geography (2024)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Oswald:wght@500;600&display=swap"
+    rel="stylesheet"
+  />
   <style>
     :root {
       color-scheme: light;
+      font-size: 18px;
+      --page-max-width: 1080px;
+      --page-padding: clamp(1.5rem, 4vw, 3rem);
+      --text-colour: #1b1f26;
+      --muted-colour: #3e4859;
+      --accent-colour: #0b4aa3;
+      --background-colour: #f7f8fb;
     }
     body {
-      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-      margin: 24px;
-      line-height: 1.6;
-      color: #1b1b1b;
+      margin: 0;
+      font-family: "Barlow", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--text-colour);
+      background: var(--background-colour);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      max-width: var(--page-max-width);
+      margin: 0 auto;
+      padding: var(--page-padding);
+      background: #fff;
+      box-shadow: 0 18px 50px rgba(21, 36, 56, 0.08);
+      border-radius: 18px;
+    }
+    header {
+      max-width: 68ch;
+      margin-bottom: 2.5rem;
     }
     h1 {
-      margin-bottom: 0.2rem;
-      font-size: 2rem;
+      margin: 0 0 0.5rem;
+      font-family: "Oswald", "Barlow", "Segoe UI", sans-serif;
+      font-size: clamp(2.4rem, 5vw, 3.2rem);
+      font-weight: 600;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+      color: #0b234a;
     }
     h2 {
-      margin-top: 2.4rem;
-      font-size: 1.4rem;
+      margin: 2.8rem 0 1rem;
+      font-family: "Oswald", "Barlow", "Segoe UI", sans-serif;
+      font-size: clamp(1.35rem, 3.1vw, 1.85rem);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #102a56;
+    }
+    p,
+    li {
+      max-width: 70ch;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+    }
+    p {
+      margin: 0.75rem 0 0;
+      color: var(--muted-colour);
+    }
+    header p:first-of-type {
+      margin-top: 0.5rem;
+      font-size: 1.05rem;
+      color: var(--text-colour);
+      font-weight: 500;
     }
     .vis {
-      margin: 1.2rem 0;
+      margin: 1.5rem 0;
     }
     .row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
       align-items: start;
+    }
+    section {
+      max-width: 70ch;
+      margin-top: 2rem;
+    }
+    ul {
+      padding-left: 1.2rem;
+      margin: 1rem 0 0;
+      display: grid;
+      gap: 0.65rem;
+    }
+    li {
+      color: var(--muted-colour);
+      line-height: 1.65;
     }
     .sr-only {
       position: absolute;
@@ -43,22 +112,35 @@
       border: 0;
     }
     button {
+      font-family: "Oswald", "Barlow", sans-serif;
       font-size: 0.95rem;
-      padding: 0.5rem 0.85rem;
-      border-radius: 6px;
-      border: 1px solid #0b5394;
-      background: #1155cc;
+      letter-spacing: 0.08em;
+      padding: 0.65rem 1.15rem;
+      border-radius: 999px;
+      border: 2px solid var(--accent-colour);
+      background: var(--accent-colour);
       color: #fff;
       cursor: pointer;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+      box-shadow: 0 12px 24px rgba(11, 74, 163, 0.18);
     }
     button:hover,
     button:focus-visible {
-      background: #0b4aa3;
+      background: #0a3a7d;
+      border-color: #0a3a7d;
+      box-shadow: 0 10px 28px rgba(11, 74, 163, 0.24);
+    }
+    button:focus-visible {
+      outline: 3px solid rgba(11, 74, 163, 0.4);
+      outline-offset: 3px;
     }
     footer {
-      margin-top: 2rem;
+      margin-top: 3rem;
       font-size: 0.95rem;
-      color: #3b3b3b;
+      color: var(--muted-colour);
+      letter-spacing: 0.02em;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
@@ -66,37 +148,41 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 </head>
 <body>
-  <header>
-    <h1>AFL Club Memberships (2024)</h1>
-    <p>Mapping where supporters congregate around each club. Membership scale drives the circle sizes, with linked charts ranking clubs and totalling each state.</p>
-    <p id="map-alt" class="sr-only">Interactive dashboard showing an Equal Earth map of AFL club home grounds sized by 2024 memberships, a leaderboard of club totals, and a state-level membership summary. Hover highlights clubs and states; clicking filters selections, with a reset button available.</p>
-  </header>
+  <div class="page">
+    <header>
+      <h1>AFL Club Memberships (2024)</h1>
+      <p>Mapping where supporters congregate around each club. Membership scale drives the circle sizes, with linked charts ranking clubs and totalling each state.</p>
+      <p id="map-alt" class="sr-only">Interactive dashboard showing an Equal Earth map of AFL club home grounds sized by 2024 memberships, a leaderboard of club totals, and a state-level membership summary. Hover highlights clubs and states; clicking filters selections, with a reset button available.</p>
+    </header>
 
-  <div id="vis-map" class="vis" aria-describedby="map-alt"></div>
-  <div class="row">
-    <div>
-      <h2>Club leaderboard</h2>
-      <div id="vis-leaderboard" class="vis"></div>
-    </div>
-    <div>
-      <h2>State share of members</h2>
-      <div id="vis-state" class="vis"></div>
-    </div>
+    <main>
+      <div id="vis-map" class="vis" aria-describedby="map-alt"></div>
+      <div class="row">
+        <div>
+          <h2>Club leaderboard</h2>
+          <div id="vis-leaderboard" class="vis"></div>
+        </div>
+        <div>
+          <h2>State share of members</h2>
+          <div id="vis-state" class="vis"></div>
+        </div>
+      </div>
+      <button id="reset-filters" type="button">Reset selections</button>
+
+      <section>
+        <h2>What stands out?</h2>
+        <ul>
+          <li>Collingwood and Carlton eclipse the competition, breaking the 100k member mark and anchoring Victoria&rsquo;s dominance.</li>
+          <li>West Coast remains the west coast powerhouse despite a smaller state population, while Sydney&rsquo;s clubs trail their Victorian peers.</li>
+          <li>Filtering reveals how interstate clubs (WA, SA, NSW, QLD) stack up when isolated from Victoria&rsquo;s deep supporter bases.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <strong>Notes:</strong> Equal Earth projection using WGS84 ground coordinates. Membership data: official AFL 2024 totals.
+    </footer>
   </div>
-  <button id="reset-filters" type="button">Reset selections</button>
-
-  <section>
-    <h2>What stands out?</h2>
-    <ul>
-      <li>Collingwood and Carlton eclipse the competition, breaking the 100k member mark and anchoring Victoria&rsquo;s dominance.</li>
-      <li>West Coast remains the west coast powerhouse despite a smaller state population, while Sydney&rsquo;s clubs trail their Victorian peers.</li>
-      <li>Filtering reveals how interstate clubs (WA, SA, NSW, QLD) stack up when isolated from Victoria&rsquo;s deep supporter bases.</li>
-    </ul>
-  </section>
-
-  <footer>
-    <strong>Notes:</strong> Equal Earth projection using WGS84 ground coordinates. Membership data: official AFL 2024 totals.
-  </footer>
 
   <script>
     const sharedParams = [
