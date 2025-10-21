@@ -230,8 +230,13 @@
       data: { url: dataUrl },
       projection: {
         type: "equalEarth",
-        center: [133.7751, -25.2744],
-        scale: 1200
+        fit: {
+          data: {
+            url: australiaTopoUrl,
+            format: { type: "topojson", feature: "countries" }
+          },
+          filter: "datum.properties.name == 'Australia'"
+        }
       },
       layer: [
         {
@@ -240,11 +245,11 @@
             format: { type: "topojson", feature: "countries" }
           },
           transform: [{ filter: "datum.properties.name == 'Australia'" }],
-          mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2, clip: true }
+          mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2 }
         },
         {
           data: { graticule: true },
-          mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent", clip: true }
+          mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent" }
         },
         {
           transform: [
