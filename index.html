@@ -143,9 +143,9 @@
       letter-spacing: 0.02em;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/vega@5/build/vega.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5/build/vega-lite.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6/build/vega-embed.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 </head>
 <body>
   <div class="page">
@@ -266,9 +266,8 @@
             {
               data: {
                 url: australiaTopoUrl,
-                format: { type: "topojson", feature: "countries" }
+                format: { type: "topojson", feature: "land" }
               },
-              transform: [{ filter: "datum.id == 36" }],
               mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2, clip: true }
             },
             {
@@ -353,9 +352,8 @@
             {
               data: {
                 url: australiaTopoUrl,
-                format: { type: "topojson", feature: "countries" }
+                format: { type: "topojson", feature: "land" }
               },
-              transform: [{ filter: "datum.id == 36" }],
               mark: { type: "geoshape", fill: "#f1f5fb", stroke: "#8eaed0", strokeWidth: 1 }
             },
             {
