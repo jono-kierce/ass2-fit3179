@@ -77,9 +77,8 @@
   "layer": [
     {
       "mark": {
-        "type": "point",
-        "filled": true,
-        "size": 220,
+        "type": "bar",
+        "cornerRadiusEnd": 8,
         "strokeWidth": 1.6
       },
       "encoding": {
@@ -134,7 +133,7 @@
         "stroke": {
           "condition": {
             "test": "hoverState != null && datum.state == hoverState || indexof(selectedStates, datum.state) >= 0",
-            "value": "#c1121f"
+            "value": "#0b234a"
           },
           "value": "#f7f1e3"
         },
