@@ -315,7 +315,7 @@
                   field: "membership_2024",
                   type: "quantitative",
                   title: "Members (2024)",
-                  scale: { range: [200, 3800] }
+                  scale: { range: [750, 3200] }
                 },
                 color: {
                   field: "state",
@@ -339,7 +339,6 @@
                   },
                   value: "#f7f1e3"
                 },
-                order: { field: "membership_2024", sort: "descending" },
                 tooltip: [
                   { field: "club", title: "Club" },
                   { field: "ground", title: "Home ground" },
@@ -369,22 +368,6 @@
           ]
         },
         {
-          data: { name: "connectorLines" },
-          mark: {
-            type: "rule",
-            stroke: "#8c8577",
-            strokeDash: [4, 6],
-            strokeWidth: 1.5,
-            opacity: 0.85
-          },
-          encoding: {
-            x: { field: "x1", type: "quantitative" },
-            y: { field: "y1", type: "quantitative" },
-            x2: { field: "x2", type: "quantitative" },
-            y2: { field: "y2", type: "quantitative" }
-          }
-        },
-        {
           view: { stroke: "none" },
           projection: {
             type: "mercator",
@@ -394,6 +377,25 @@
             clipExtent: [[40, 40], [340, 320]]
           },
           layer: [
+            {
+              data: { values: [{ label: "Melbourne & Geelong Inset" }] },
+              mark: {
+                type: "text",
+                x: 190,
+                y: 56,
+                fontSize: 14,
+                fontWeight: "bold",
+                fill: "#102a56",
+                stroke: "#ffffff",
+                strokeWidth: 3,
+                strokeOpacity: 0.85
+              },
+              encoding: {
+                text: { field: "label" },
+                align: { value: "center" },
+                baseline: { value: "top" }
+              }
+            },
             {
               data: {
                 url: australiaTopoUrl,
@@ -427,7 +429,6 @@
                   legend: null,
                   scale: { domain: stateColourDomain, range: stateColourRange }
                 },
-                order: { field: "membership_2024", sort: "descending" },
                 opacity: {
                   condition: [
                     { test: "hoverClub != null && datum.club == hoverClub", value: 1 },
@@ -665,37 +666,6 @@
       const stateView = stateRes.view;
       const perCapitaView = perCapitaRes.view;
       const allViews = [mapView, leaderboardView, stateView, perCapitaView];
-
-      const mainProjection = mapView.projection("projection");
-      if (typeof mainProjection === "function") {
-        const extentCorners = [
-          [melbourneBounds.lonMin, melbourneBounds.latMax],
-          [melbourneBounds.lonMax, melbourneBounds.latMax],
-          [melbourneBounds.lonMax, melbourneBounds.latMin],
-          [melbourneBounds.lonMin, melbourneBounds.latMin]
-        ];
-        const insetClipExtent = [[40, 40], [340, 320]];
-        const insetCorners = [
-          [insetClipExtent[0][0], insetClipExtent[0][1]],
-          [insetClipExtent[1][0], insetClipExtent[0][1]],
-          [insetClipExtent[1][0], insetClipExtent[1][1]],
-          [insetClipExtent[0][0], insetClipExtent[1][1]]
-        ];
-
-        const connectorData = extentCorners.map(([lon, lat], index) => {
-          const [x, y] = mainProjection([lon, lat]);
-          const [x2, y2] = insetCorners[index];
-          return { x1: x, y1: y, x2, y2 };
-        });
-
-        const connectorChangeset = vega
-          .changeset()
-          .remove(() => true)
-          .insert(connectorData);
-
-        mapView.change("connectorLines", connectorChangeset);
-        mapView.runAsync();
-      }
 
       function syncViews() {
         allViews.forEach((view) => {
