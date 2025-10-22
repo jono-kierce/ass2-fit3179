@@ -1,0 +1,82 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 420,
+  "data": { "url": "../data/afl_clubs_2024_geo.csv" },
+  "params": [
+    { "name": "hoverClub", "value": null },
+    { "name": "hoverState", "value": null },
+    { "name": "selectedClubs", "value": [] },
+    { "name": "selectedStates", "value": [] }
+  ],
+  "transform": [
+    { "filter": "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+    { "filter": "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" },
+    {
+      "aggregate": [
+        { "op": "sum", "field": "membership_2024", "as": "total_membership" }
+      ],
+      "groupby": ["state"]
+    },
+    {
+      "lookup": "state",
+      "from": {
+        "data": { "url": "../data/pop_by_state.csv" },
+        "key": "state_abbrev",
+        "fields": ["state_name", "erp_2025_03_31"]
+      }
+    },
+    { "calculate": "datum.total_membership / datum.erp_2025_03_31 * 1000", "as": "members_per_1000" },
+    {
+      "window": [
+        { "op": "rank", "as": "per_capita_rank" }
+      ],
+      "sort": [
+        { "field": "members_per_1000", "order": "descending" }
+      ]
+    }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "point", "filled": true, "size": 220, "strokeWidth": 1.6 },
+      "encoding": {
+        "y": { "field": "state", "type": "nominal", "sort": "-x", "title": "State" },
+        "x": {
+          "field": "members_per_1000",
+          "type": "quantitative",
+          "title": "Members per 1,000 residents",
+          "axis": { "format": ".1f" }
+        },
+        "color": {
+          "field": "state",
+          "type": "nominal",
+          "legend": null,
+          "scale": {
+            "domain": ["VIC", "WA", "SA", "NSW", "QLD"],
+            "range": ["#c1121f", "#2f7d3f", "#f2a541", "#234f72", "#7b1d5a"]
+          }
+        },
+        "opacity": {
+          "condition": [
+            { "test": "hoverState != null && datum.state == hoverState", "value": 1 },
+            { "test": "indexof(selectedStates, datum.state) >= 0", "value": 1 }
+          ],
+          "value": 0.45
+        },
+        "stroke": {
+          "condition": {
+            "test": "hoverState != null && datum.state == hoverState || indexof(selectedStates, datum.state) >= 0",
+            "value": "#c1121f"
+          },
+          "value": "#f7f1e3"
+        },
+        "tooltip": [
+          { "field": "state_name", "title": "State" },
+          { "field": "total_membership", "title": "Members (2024)", "format": "," },
+          { "field": "erp_2025_03_31", "title": "Population (ERP Mar 2025)", "format": "," },
+          { "field": "members_per_1000", "title": "Members per 1,000", "format": ".1f" }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 460,
+  "height": 520,
+  "data": { "url": "../data/afl_clubs_2024_geo.csv" },
+  "params": [
+    { "name": "hoverClub", "value": null },
+    { "name": "hoverState", "value": null },
+    { "name": "selectedClubs", "value": [] },
+    { "name": "selectedStates", "value": [] }
+  ],
+  "transform": [
+    { "filter": "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+    { "filter": "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" },
+    {
+      "aggregate": [
+        { "op": "sum", "field": "membership_2024", "as": "total_membership" }
+      ],
+      "groupby": ["state"]
+    },
+    {
+      "window": [
+        { "op": "rank", "as": "rank_state" }
+      ],
+      "sort": [
+        { "field": "total_membership", "order": "descending" }
+      ]
+    }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "bar", "cornerRadiusEnd": 4 },
+      "encoding": {
+        "y": { "field": "state", "type": "nominal", "sort": "-x", "title": "State" },
+        "x": {
+          "field": "total_membership",
+          "type": "quantitative",
+          "title": "Total members (2024)",
+          "axis": { "format": "," }
+        },
+        "color": {
+          "field": "state",
+          "type": "nominal",
+          "legend": null,
+          "scale": {
+            "domain": ["VIC", "WA", "SA", "NSW", "QLD"],
+            "range": ["#c1121f", "#2f7d3f", "#f2a541", "#234f72", "#7b1d5a"]
+          }
+        },
+        "opacity": {
+          "condition": [
+            { "test": "hoverState != null && datum.state == hoverState", "value": 1 },
+            { "test": "indexof(selectedStates, datum.state) >= 0", "value": 1 }
+          ],
+          "value": 0.5
+        },
+        "tooltip": [
+          { "field": "state", "title": "State" },
+          { "field": "total_membership", "title": "Members (2024)", "format": "," }
+        ]
+      }
+    },
+    {
+      "transform": [
+        { "filter": "datum.rank_state == 1" }
+      ],
+      "mark": { "type": "text", "align": "left", "dx": 6, "fontWeight": "bold", "fill": "#111" },
+      "encoding": {
+        "y": { "field": "state", "type": "nominal" },
+        "x": { "field": "total_membership", "type": "quantitative" },
+        "text": { "value": "Largest share" }
+      }
+    }
+  ]
+}

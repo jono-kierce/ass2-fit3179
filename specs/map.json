@@ -1,0 +1,238 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 520,
+  "data": { "url": "../data/afl_clubs_2024_geo.csv" },
+  "params": [
+    { "name": "hoverClub", "value": null },
+    { "name": "hoverState", "value": null },
+    { "name": "selectedClubs", "value": [] },
+    { "name": "selectedStates", "value": [] }
+  ],
+  "layer": [
+    {
+      "projection": {
+        "type": "equalEarth",
+        "center": [133.7751, -25.2744],
+        "scale": 950
+      },
+      "layer": [
+        {
+          "data": {
+            "url": "../data/world-110m.json",
+            "format": { "type": "topojson", "feature": "land" }
+          },
+          "mark": {
+            "type": "geoshape",
+            "fill": "#dfe7d2",
+            "stroke": "#99a38e",
+            "strokeWidth": 1.2,
+            "clip": true
+          }
+        },
+        {
+          "transform": [
+            { "filter": "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+            { "filter": "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" }
+          ],
+          "mark": { "type": "circle", "opacity": 0.9, "strokeWidth": 1.5 },
+          "encoding": {
+            "longitude": { "field": "lon", "type": "quantitative" },
+            "latitude": { "field": "lat", "type": "quantitative" },
+            "size": {
+              "field": "membership_2024",
+              "type": "quantitative",
+              "title": "Members (2024)",
+              "scale": { "range": [200, 3500] }
+            },
+            "color": {
+              "field": "state",
+              "type": "nominal",
+              "legend": { "title": "State" },
+              "scale": {
+                "domain": ["VIC", "WA", "SA", "NSW", "QLD"],
+                "range": ["#c1121f", "#2f7d3f", "#f2a541", "#234f72", "#7b1d5a"]
+              }
+            },
+            "opacity": {
+              "condition": [
+                { "test": "hoverClub != null && datum.club == hoverClub", "value": 1 },
+                { "test": "hoverClub == null && hoverState != null && datum.state == hoverState", "value": 0.95 },
+                { "test": "indexof(selectedClubs, datum.club) >= 0", "value": 1 },
+                {
+                  "test": "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0",
+                  "value": 0.95
+                }
+              ],
+              "value": 0.45
+            },
+            "stroke": {
+              "condition": {
+                "test": "indexof(selectedClubs, datum.club) >= 0",
+                "value": "#c1121f"
+              },
+              "value": "#f7f1e3"
+            },
+            "tooltip": [
+              { "field": "club", "title": "Club" },
+              { "field": "ground", "title": "Home ground" },
+              { "field": "membership_2024", "title": "Members (2024)", "format": "," },
+              { "field": "state", "title": "State" }
+            ]
+          }
+        },
+        {
+          "transform": [
+            { "window": [{ "op": "rank", "as": "rank_membership" }], "sort": [{ "field": "membership_2024", "order": "descending" }] },
+            { "filter": "datum.rank_membership <= 3" }
+          ],
+          "mark": {
+            "type": "text",
+            "dy": -18,
+            "fontWeight": "bold",
+            "fontSize": 12,
+            "fill": "#111",
+            "stroke": "white",
+            "strokeWidth": 3,
+            "strokeOpacity": 0.8
+          },
+          "encoding": {
+            "longitude": { "field": "lon", "type": "quantitative" },
+            "latitude": { "field": "lat", "type": "quantitative" },
+            "text": {
+              "signal": "datum.rank_membership + '. ' + datum.club + ' (' + format(datum.membership_2024, ',') + ')'"
+            }
+          }
+        },
+        {
+          "data": {
+            "values": [
+              {
+                "type": "Feature",
+                "properties": { "name": "Melbourne-Geelong extent" },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [[
+                    [144.2, -38.4],
+                    [145.4, -38.4],
+                    [145.4, -37.45],
+                    [144.2, -37.45],
+                    [144.2, -38.4]
+                  ]]
+                }
+              }
+            ]
+          },
+          "mark": { "type": "geoshape", "fill": null, "stroke": "#c1121f", "strokeDash": [6, 4], "strokeWidth": 2, "clip": true }
+        }
+      ]
+    },
+    {
+      "view": { "stroke": "none" },
+      "projection": {
+        "type": "mercator",
+        "center": [144.8, -37.925],
+        "scale": 6500,
+        "translate": [190, 180],
+        "clipExtent": [[40, 40], [340, 320]]
+      },
+      "layer": [
+        {
+          "data": {
+            "url": "../data/world-110m.json",
+            "format": { "type": "topojson", "feature": "land" }
+          },
+          "mark": { "type": "geoshape", "fill": "#dfe7d2", "stroke": "#99a38e", "strokeWidth": 1 }
+        },
+        {
+          "data": {
+            "values": [
+              {
+                "type": "Feature",
+                "properties": { "name": "Melbourne-Geelong extent" },
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [[
+                    [144.2, -38.4],
+                    [145.4, -38.4],
+                    [145.4, -37.45],
+                    [144.2, -37.45],
+                    [144.2, -38.4]
+                  ]]
+                }
+              }
+            ]
+          },
+          "mark": { "type": "geoshape", "fill": null, "stroke": "#c1121f", "strokeWidth": 2 }
+        },
+        {
+          "data": { "values": [{}] },
+          "mark": {
+            "type": "text",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "fill": "#102a56",
+            "baseline": "top"
+          },
+          "encoding": {
+            "x": { "value": 190 },
+            "y": { "value": 52 },
+            "text": { "value": "Melbourne & Geelong clubs" }
+          }
+        },
+        {
+          "transform": [
+            { "filter": "datum.lon >= 144.2 && datum.lon <= 145.4" },
+            { "filter": "datum.lat >= -38.4 && datum.lat <= -37.45" },
+            { "filter": "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+            { "filter": "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" }
+          ],
+          "mark": { "type": "circle", "opacity": 0.95, "strokeWidth": 1.5 },
+          "encoding": {
+            "longitude": { "field": "lon", "type": "quantitative" },
+            "latitude": { "field": "lat", "type": "quantitative" },
+            "size": {
+              "field": "membership_2024",
+              "type": "quantitative",
+              "scale": { "range": [200, 3500] }
+            },
+            "color": {
+              "field": "state",
+              "type": "nominal",
+              "legend": null,
+              "scale": {
+                "domain": ["VIC", "WA", "SA", "NSW", "QLD"],
+                "range": ["#c1121f", "#2f7d3f", "#f2a541", "#234f72", "#7b1d5a"]
+              }
+            },
+            "opacity": {
+              "condition": [
+                { "test": "hoverClub != null && datum.club == hoverClub", "value": 1 },
+                { "test": "hoverClub == null && hoverState != null && datum.state == hoverState", "value": 1 },
+                { "test": "indexof(selectedClubs, datum.club) >= 0", "value": 1 },
+                {
+                  "test": "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0",
+                  "value": 1
+                }
+              ],
+              "value": 0.45
+            },
+            "stroke": {
+              "condition": {
+                "test": "indexof(selectedClubs, datum.club) >= 0",
+                "value": "#c1121f"
+              },
+              "value": "#f7f1e3"
+            },
+            "tooltip": [
+              { "field": "club", "title": "Club" },
+              { "field": "ground", "title": "Home ground" },
+              { "field": "membership_2024", "title": "Members (2024)", "format": "," },
+              { "field": "state", "title": "State" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 460,
+  "height": 520,
+  "data": { "url": "../data/afl_clubs_2024_geo.csv" },
+  "params": [
+    { "name": "hoverClub", "value": null },
+    { "name": "hoverState", "value": null },
+    { "name": "selectedClubs", "value": [] },
+    { "name": "selectedStates", "value": [] }
+  ],
+  "transform": [
+    { "filter": "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
+    { "filter": "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" },
+    {
+      "aggregate": [
+        { "op": "max", "field": "membership_2024", "as": "membership_2024" }
+      ],
+      "groupby": ["club", "state"]
+    },
+    {
+      "window": [
+        { "op": "rank", "as": "rank_membership" }
+      ],
+      "sort": [
+        { "field": "membership_2024", "order": "descending" }
+      ]
+    }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "bar", "cornerRadiusEnd": 4 },
+      "encoding": {
+        "y": { "field": "club", "type": "nominal", "sort": "-x", "title": null },
+        "x": {
+          "field": "membership_2024",
+          "type": "quantitative",
+          "title": "Members (2024)",
+          "axis": { "format": "," }
+        },
+        "color": {
+          "field": "state",
+          "type": "nominal",
+          "legend": { "title": "State" },
+          "scale": {
+            "domain": ["VIC", "WA", "SA", "NSW", "QLD"],
+            "range": ["#c1121f", "#2f7d3f", "#f2a541", "#234f72", "#7b1d5a"]
+          }
+        },
+        "opacity": {
+          "condition": [
+            { "test": "hoverClub != null && datum.club == hoverClub", "value": 1 },
+            { "test": "hoverClub == null && hoverState != null && datum.state == hoverState", "value": 0.95 },
+            { "test": "indexof(selectedClubs, datum.club) >= 0", "value": 1 },
+            {
+              "test": "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0",
+              "value": 0.95
+            }
+          ],
+          "value": 0.5
+        },
+        "tooltip": [
+          { "field": "club", "title": "Club" },
+          { "field": "membership_2024", "title": "Members (2024)", "format": "," },
+          { "field": "state", "title": "State" }
+        ]
+      }
+    },
+    {
+      "transform": [
+        { "filter": "datum.rank_membership <= 3" }
+      ],
+      "mark": { "type": "text", "align": "left", "dx": 6, "fontWeight": "bold", "fill": "#111" },
+      "encoding": {
+        "y": { "field": "club", "type": "nominal", "sort": "-x" },
+        "x": { "field": "membership_2024", "type": "quantitative" },
+        "text": { "signal": "'Top ' + datum.rank_membership" }
+      }
+    },
+    {
+      "transform": [
+        { "aggregate": [
+            { "op": "median", "field": "membership_2024", "as": "median_membership" }
+          ]
+        }
+      ],
+      "mark": { "type": "rule", "color": "#6f6f6f", "strokeDash": [4, 4], "strokeWidth": 2 },
+      "encoding": {
+        "x": { "field": "median_membership", "type": "quantitative" }
+      }
+    },
+    {
+      "transform": [
+        { "aggregate": [
+            { "op": "median", "field": "membership_2024", "as": "median_membership" }
+          ]
+        }
+      ],
+      "mark": { "type": "text", "dy": -8, "dx": 4, "align": "left", "baseline": "bottom", "fill": "#333", "fontWeight": "bold" },
+      "encoding": {
+        "x": { "field": "median_membership", "type": "quantitative" },
+        "y": { "value": -10 },
+        "text": { "signal": "'Median: ' + format(datum.median_membership, ',')" }
+      }
+    }
+  ]
+}
