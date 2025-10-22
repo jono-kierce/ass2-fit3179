@@ -283,7 +283,6 @@
       width: 900,
       height: 520,
       data: { url: dataUrl },
-      datasets: { connectorLines: [] },
       layer: [
         {
           projection: {
@@ -370,10 +369,16 @@
         },
         {
           data: { name: "connectorLines" },
-          mark: { type: "rule", stroke: "#6a6458", strokeDash: [4, 5], strokeWidth: 1.6 },
+          mark: {
+            type: "rule",
+            stroke: "#8c8577",
+            strokeDash: [4, 6],
+            strokeWidth: 1.5,
+            opacity: 0.85
+          },
           encoding: {
-            x: { field: "x", type: "quantitative" },
-            y: { field: "y", type: "quantitative" },
+            x: { field: "x1", type: "quantitative" },
+            y: { field: "y1", type: "quantitative" },
             x2: { field: "x2", type: "quantitative" },
             y2: { field: "y2", type: "quantitative" }
           }
@@ -660,50 +665,35 @@
       const allViews = [mapView, leaderboardView, stateView, perCapitaView];
 
       const mainProjection = mapView.projection("projection");
-      const extentCorners = [
-        [melbourneBounds.lonMin, melbourneBounds.latMin],
-        [melbourneBounds.lonMax, melbourneBounds.latMin],
-        [melbourneBounds.lonMax, melbourneBounds.latMax],
-        [melbourneBounds.lonMin, melbourneBounds.latMax]
-      ];
-      const projectedCorners = extentCorners.map(([lon, lat]) => {
-        const [x, y] = mainProjection([lon, lat]);
-        return { x, y };
-      });
+      if (typeof mainProjection === "function") {
+        const extentCorners = [
+          [melbourneBounds.lonMin, melbourneBounds.latMax],
+          [melbourneBounds.lonMax, melbourneBounds.latMax],
+          [melbourneBounds.lonMax, melbourneBounds.latMin],
+          [melbourneBounds.lonMin, melbourneBounds.latMin]
+        ];
+        const insetClipExtent = [[40, 40], [340, 320]];
+        const insetCorners = [
+          [insetClipExtent[0][0], insetClipExtent[0][1]],
+          [insetClipExtent[1][0], insetClipExtent[0][1]],
+          [insetClipExtent[1][0], insetClipExtent[1][1]],
+          [insetClipExtent[0][0], insetClipExtent[1][1]]
+        ];
 
-      const insetLayer = mapSpec.layer.find(layer => layer?.projection?.clipExtent);
-      const clipExtent = insetLayer?.projection?.clipExtent ?? [[40, 40], [340, 320]];
-      const insetCorners = [
-        { x: clipExtent[0][0], y: clipExtent[1][1] },
-        { x: clipExtent[1][0], y: clipExtent[1][1] },
-        { x: clipExtent[1][0], y: clipExtent[0][1] },
-        { x: clipExtent[0][0], y: clipExtent[0][1] }
-      ];
+        const connectorData = extentCorners.map(([lon, lat], index) => {
+          const [x, y] = mainProjection([lon, lat]);
+          const [x2, y2] = insetCorners[index];
+          return { x1: x, y1: y, x2, y2 };
+        });
 
-      const connectorLines = projectedCorners.map((corner, index) => {
-        const insetCorner = insetCorners[index];
-        const dx = insetCorner.x - corner.x;
-        const dy = insetCorner.y - corner.y;
-        const length = Math.hypot(dx, dy) || 1;
-        const startOffset = 6;
-        const endOffset = 4;
-
-        return {
-          x: corner.x + (dx / length) * startOffset,
-          y: corner.y + (dy / length) * startOffset,
-          x2: insetCorner.x - (dx / length) * endOffset,
-          y2: insetCorner.y - (dy / length) * endOffset
-        };
-      });
-
-      mapView.change(
-        "connectorLines",
-        vega
+        const connectorChangeset = vega
           .changeset()
           .remove(() => true)
-          .insert(connectorLines)
-      );
-      mapView.runAsync();
+          .insert(connectorData);
+
+        mapView.change("connectorLines", connectorChangeset);
+        mapView.runAsync();
+      }
 
       function syncViews() {
         allViews.forEach((view) => {
