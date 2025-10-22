@@ -299,10 +299,6 @@
               mark: { type: "geoshape", fill: "#dfe7d2", stroke: "#99a38e", strokeWidth: 1.2, clip: true }
             },
             {
-              data: { graticule: true },
-              mark: { type: "geoshape", stroke: "#bec7ba", strokeWidth: 0.5, fill: "transparent", clip: true }
-            },
-            {
               transform: [
                 { filter: "selectedClubs.length == 0 || indexof(selectedClubs, datum.club) >= 0" },
                 { filter: "selectedStates.length == 0 || indexof(selectedStates, datum.state) >= 0" }
