@@ -16,10 +16,11 @@
       font-size: 18px;
       --page-max-width: 1080px;
       --page-padding: clamp(1.5rem, 4vw, 3rem);
-      --text-colour: #1b1f26;
-      --muted-colour: #3e4859;
-      --accent-colour: #0b4aa3;
-      --background-colour: #f7f8fb;
+      --text-colour: #1c1a16;
+      --muted-colour: #4b463c;
+      --accent-colour: #c1121f;
+      --hover-colour: #2f7d3f;
+      --background-colour: #f7f1e3;
     }
     body {
       margin: 0;
@@ -124,21 +125,22 @@
       border-radius: 999px;
       border: 2px solid var(--accent-colour);
       background: var(--accent-colour);
-      color: #fff;
+      color: #fffaf5;
       cursor: pointer;
       text-transform: uppercase;
       font-weight: 500;
-      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
-      box-shadow: 0 12px 24px rgba(11, 74, 163, 0.18);
+      transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      box-shadow: 0 12px 24px rgba(193, 18, 31, 0.25);
     }
     button:hover,
     button:focus-visible {
-      background: #0a3a7d;
-      border-color: #0a3a7d;
-      box-shadow: 0 10px 28px rgba(11, 74, 163, 0.24);
+      background: var(--hover-colour);
+      border-color: var(--hover-colour);
+      box-shadow: 0 10px 28px rgba(47, 125, 63, 0.28);
+      color: #ffffff;
     }
     button:focus-visible {
-      outline: 3px solid rgba(11, 74, 163, 0.4);
+      outline: 3px solid rgba(47, 125, 63, 0.45);
       outline-offset: 3px;
     }
     footer {
@@ -266,6 +268,16 @@
       }
     };
 
+    const stateColours = {
+      VIC: "#c1121f",
+      WA: "#2f7d3f",
+      SA: "#f2a541",
+      NSW: "#234f72",
+      QLD: "#7b1d5a"
+    };
+    const stateColourDomain = Object.keys(stateColours);
+    const stateColourRange = stateColourDomain.map(state => stateColours[state]);
+
     const mapSpec = withSharedParams({
       $schema: "https://vega.github.io/schema/vega-lite/v5.json",
       width: 900,
@@ -284,11 +296,11 @@
                 url: australiaTopoUrl,
                 format: { type: "topojson", feature: "land" }
               },
-              mark: { type: "geoshape", fill: "#e8f1fb", stroke: "#8eaed0", strokeWidth: 1.2, clip: true }
+              mark: { type: "geoshape", fill: "#dfe7d2", stroke: "#99a38e", strokeWidth: 1.2, clip: true }
             },
             {
               data: { graticule: true },
-              mark: { type: "geoshape", stroke: "#d0d0d0", strokeWidth: 0.5, fill: "transparent", clip: true }
+              mark: { type: "geoshape", stroke: "#bec7ba", strokeWidth: 0.5, fill: "transparent", clip: true }
             },
             {
               transform: [
@@ -309,7 +321,7 @@
                   field: "state",
                   type: "nominal",
                   legend: { title: "State" },
-                  scale: { scheme: "tableau10" }
+                  scale: { domain: stateColourDomain, range: stateColourRange }
                 },
                 opacity: {
                   condition: [
@@ -318,14 +330,14 @@
                     { test: "indexof(selectedClubs, datum.club) >= 0", value: 1 },
                     { test: "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0", value: 0.95 }
                   ],
-                  value: 0.35
+                  value: 0.45
                 },
                 stroke: {
                   condition: {
                     test: "indexof(selectedClubs, datum.club) >= 0",
-                    value: "#1a1a1a"
+                    value: "#c1121f"
                   },
-                  value: "#ffffff"
+                  value: "#f7f1e3"
                 },
                 tooltip: [
                   { field: "club", title: "Club" },
@@ -351,7 +363,7 @@
             },
             {
               data: { values: [melbourneExtentFeature] },
-              mark: { type: "geoshape", fill: null, stroke: "#0b4aa3", strokeDash: [6, 4], strokeWidth: 2, clip: true }
+              mark: { type: "geoshape", fill: null, stroke: "#c1121f", strokeDash: [6, 4], strokeWidth: 2, clip: true }
             }
           ]
         },
@@ -370,11 +382,11 @@
                 url: australiaTopoUrl,
                 format: { type: "topojson", feature: "land" }
               },
-              mark: { type: "geoshape", fill: "#f1f5fb", stroke: "#8eaed0", strokeWidth: 1 }
+              mark: { type: "geoshape", fill: "#dfe7d2", stroke: "#99a38e", strokeWidth: 1 }
             },
             {
               data: { values: [melbourneExtentFeature] },
-              mark: { type: "geoshape", fill: null, stroke: "#0b4aa3", strokeWidth: 2 }
+              mark: { type: "geoshape", fill: null, stroke: "#c1121f", strokeWidth: 2 }
             },
             {
               transform: [
@@ -396,7 +408,7 @@
                   field: "state",
                   type: "nominal",
                   legend: null,
-                  scale: { scheme: "tableau10" }
+                  scale: { domain: stateColourDomain, range: stateColourRange }
                 },
                 opacity: {
                   condition: [
@@ -410,9 +422,9 @@
                 stroke: {
                   condition: {
                     test: "indexof(selectedClubs, datum.club) >= 0",
-                    value: "#1a1a1a"
+                    value: "#c1121f"
                   },
-                  value: "#ffffff"
+                  value: "#f7f1e3"
                 },
                 tooltip: [
                   { field: "club", title: "Club" },
@@ -453,7 +465,7 @@
               field: "state",
               type: "nominal",
               legend: { title: "State" },
-              scale: { scheme: "tableau10" }
+              scale: { domain: stateColourDomain, range: stateColourRange }
             },
             opacity: {
               condition: [
@@ -462,7 +474,7 @@
                 { test: "indexof(selectedClubs, datum.club) >= 0", value: 1 },
                 { test: "selectedClubs.length == 0 && selectedStates.length > 0 && indexof(selectedStates, datum.state) >= 0", value: 0.95 }
               ],
-              value: 0.4
+              value: 0.5
             },
             tooltip: [
               { field: "club", title: "Club" },
@@ -531,14 +543,14 @@
               field: "state",
               type: "nominal",
               legend: null,
-              scale: { scheme: "tableau10" }
+              scale: { domain: stateColourDomain, range: stateColourRange }
             },
             opacity: {
               condition: [
                 { test: "hoverState != null && datum.state == hoverState", value: 1 },
                 { test: "indexof(selectedStates, datum.state) >= 0", value: 1 }
               ],
-              value: 0.4
+              value: 0.5
             },
             tooltip: [
               { field: "state", title: "State" },
@@ -589,20 +601,20 @@
               title: "Members per 1,000 residents",
               axis: { format: ".1f" }
             },
-            color: { field: "state", type: "nominal", legend: null, scale: { scheme: "tableau10" } },
+            color: { field: "state", type: "nominal", legend: null, scale: { domain: stateColourDomain, range: stateColourRange } },
             opacity: {
               condition: [
                 { test: "hoverState != null && datum.state == hoverState", value: 1 },
                 { test: "indexof(selectedStates, datum.state) >= 0", value: 1 }
               ],
-              value: 0.35
+              value: 0.45
             },
             stroke: {
               condition: {
                 test: "hoverState != null && datum.state == hoverState || indexof(selectedStates, datum.state) >= 0",
-                value: "#0b234a"
+                value: "#c1121f"
               },
-              value: "#ffffff"
+              value: "#f7f1e3"
             },
             tooltip: [
               { field: "state_name", title: "State" },
