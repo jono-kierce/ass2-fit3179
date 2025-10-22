@@ -378,25 +378,6 @@
           },
           layer: [
             {
-              data: { values: [{ label: "Melbourne & Geelong Inset" }] },
-              mark: {
-                type: "text",
-                x: 190,
-                y: 56,
-                fontSize: 14,
-                fontWeight: "bold",
-                fill: "#102a56",
-                stroke: "#ffffff",
-                strokeWidth: 3,
-                strokeOpacity: 0.85
-              },
-              encoding: {
-                text: { field: "label" },
-                align: { value: "center" },
-                baseline: { value: "top" }
-              }
-            },
-            {
               data: {
                 url: australiaTopoUrl,
                 format: { type: "topojson", feature: "land" }
@@ -406,6 +387,21 @@
             {
               data: { values: [melbourneExtentFeature] },
               mark: { type: "geoshape", fill: null, stroke: "#c1121f", strokeWidth: 2 }
+            },
+            {
+              data: { values: [{}] },
+              mark: {
+                type: "text",
+                fontSize: 14,
+                fontWeight: "bold",
+                fill: "#102a56",
+                baseline: "top"
+              },
+              encoding: {
+                x: { value: 190 },
+                y: { value: 52 },
+                text: { value: "Melbourne & Geelong clubs" }
+              }
             },
             {
               transform: [
