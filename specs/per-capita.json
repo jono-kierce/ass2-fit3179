@@ -3,7 +3,7 @@
   "width": 900,
   "height": 420,
   "data": {
-    "url": "/data/afl_clubs_2024_geo.csv"
+    "url": "https://jono-kierce.github.io/ass2-fit3179/data/afl_clubs_2024_geo.csv"
   },
   "params": [
     {
