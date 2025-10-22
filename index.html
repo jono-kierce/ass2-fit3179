@@ -283,6 +283,7 @@
       width: 900,
       height: 520,
       data: { url: dataUrl },
+      datasets: { connectorLines: [] },
       layer: [
         {
           projection: {
@@ -366,6 +367,16 @@
               mark: { type: "geoshape", fill: null, stroke: "#c1121f", strokeDash: [6, 4], strokeWidth: 2, clip: true }
             }
           ]
+        },
+        {
+          data: { name: "connectorLines" },
+          mark: { type: "rule", stroke: "#6a6458", strokeDash: [4, 5], strokeWidth: 1.6 },
+          encoding: {
+            x: { field: "x", type: "quantitative" },
+            y: { field: "y", type: "quantitative" },
+            x2: { field: "x2", type: "quantitative" },
+            y2: { field: "y2", type: "quantitative" }
+          }
         },
         {
           view: { stroke: "none" },
@@ -647,6 +658,52 @@
       const stateView = stateRes.view;
       const perCapitaView = perCapitaRes.view;
       const allViews = [mapView, leaderboardView, stateView, perCapitaView];
+
+      const mainProjection = mapView.projection("projection");
+      const extentCorners = [
+        [melbourneBounds.lonMin, melbourneBounds.latMin],
+        [melbourneBounds.lonMax, melbourneBounds.latMin],
+        [melbourneBounds.lonMax, melbourneBounds.latMax],
+        [melbourneBounds.lonMin, melbourneBounds.latMax]
+      ];
+      const projectedCorners = extentCorners.map(([lon, lat]) => {
+        const [x, y] = mainProjection([lon, lat]);
+        return { x, y };
+      });
+
+      const insetLayer = mapSpec.layer.find(layer => layer?.projection?.clipExtent);
+      const clipExtent = insetLayer?.projection?.clipExtent ?? [[40, 40], [340, 320]];
+      const insetCorners = [
+        { x: clipExtent[0][0], y: clipExtent[1][1] },
+        { x: clipExtent[1][0], y: clipExtent[1][1] },
+        { x: clipExtent[1][0], y: clipExtent[0][1] },
+        { x: clipExtent[0][0], y: clipExtent[0][1] }
+      ];
+
+      const connectorLines = projectedCorners.map((corner, index) => {
+        const insetCorner = insetCorners[index];
+        const dx = insetCorner.x - corner.x;
+        const dy = insetCorner.y - corner.y;
+        const length = Math.hypot(dx, dy) || 1;
+        const startOffset = 6;
+        const endOffset = 4;
+
+        return {
+          x: corner.x + (dx / length) * startOffset,
+          y: corner.y + (dy / length) * startOffset,
+          x2: insetCorner.x - (dx / length) * endOffset,
+          y2: insetCorner.y - (dy / length) * endOffset
+        };
+      });
+
+      mapView.change(
+        "connectorLines",
+        vega
+          .changeset()
+          .remove(() => true)
+          .insert(connectorLines)
+      );
+      mapView.runAsync();
 
       function syncViews() {
         allViews.forEach((view) => {
