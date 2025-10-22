@@ -46,7 +46,7 @@
       "lookup": "state",
       "from": {
         "data": {
-          "url": "../data/pop_by_state.csv"
+          "url": "https://jono-kierce.github.io/ass2-fit3179/data/pop_by_state.csv"
         },
         "key": "state_abbrev",
         "fields": [

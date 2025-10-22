@@ -36,7 +36,7 @@
       "layer": [
         {
           "data": {
-            "url": "../data/world-110m.json",
+            "url": "https://jono-kierce.github.io/ass2-fit3179/data/world-110m.json",
             "format": {
               "type": "topojson",
               "feature": "land"
@@ -281,7 +281,7 @@
       "layer": [
         {
           "data": {
-            "url": "../data/world-110m.json",
+            "url": "https://jono-kierce.github.io/ass2-fit3179/data/world-110m.json",
             "format": {
               "type": "topojson",
               "feature": "land"
